@@ -98,7 +98,7 @@ Game controls:
 ├── config.py          # Configuration
 ├── requirements.txt   # Dependencies
 ├── models/            # Trained models directory
-│   └── model_weights.pth    # Pre-trained model
+├── model_weights.py   # Pretrained model
 └── eng_documentation.pdf    # Project documentation
 ```
 
