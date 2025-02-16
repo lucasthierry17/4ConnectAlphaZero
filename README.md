@@ -32,8 +32,8 @@ virtual environment (recommended)
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/connect-four-alphazero.git
-cd connect-four-alphazero
+git clone https://github.com/lucasthierry/4ConnectAlphaZero.git
+cd 4ConnectAlphaZero
 ```
 
 2. Create and activate virtual environment
@@ -89,14 +89,17 @@ Game controls:
 
 ```
 4ConnectAlphaZero/
-├── connectfour.py    # Game mechanics
-├── network.py        # Neural network
-├── mcts.py           # Monte Carlo Tree Search
-├── train.py         # AlphaZero algorithm
-├── play.py          # Game interface
-├── main.py          # Training script
-├── config.py        # Configuration
-└── requirements.txt  # Dependencies
+├── connectfour.py     # Game mechanics
+├── network.py         # Neural network
+├── mcts.py            # Monte Carlo Tree Search
+├── train.py           # AlphaZero algorithm
+├── play.py            # Game interface
+├── main.py            # Training script
+├── config.py          # Configuration
+├── requirements.txt   # Dependencies
+├── models/            # Trained models directory
+│   └── model_weights.pth    # Pre-trained model
+└── eng_documentation.pdf    # Project documentation
 ```
 
 ## 🛠️ Technical Details
@@ -150,9 +153,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 👥 Contact
 
-Your Name - [@yourusername](https://twitter.com/yourusername)
+Lucas Müller - [@lucasthierry17]
 
-Project Link: [https://github.com/yourusername/connect-four-alphazero](https://github.com/yourusername/connect-four-alphazero)
+Project Link: [https://github.com/lucasthiery17/4ConnectAlphaZero](https://github.com/lucasthierry17/4ConnectAlphaZero)
 
 ## 🙏 Acknowledgments
 
