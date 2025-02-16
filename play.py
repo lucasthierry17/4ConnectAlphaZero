@@ -52,7 +52,7 @@ class ConnectFourGUI:
         self.config = Config()
         self.network = ResNet(self.game, self.config).to(self.config.device)
         self.network.load_state_dict(
-            torch.load(model_path, map_location=self.config.device)
+            torch.load(model_path, map_location=self.config.device, weights_only=False)
         )
         self.network.eval()
         self.mcts = MCTS(self.network, self.game, self.config)
