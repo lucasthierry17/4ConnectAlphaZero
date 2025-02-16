@@ -3,18 +3,20 @@ import torch.nn.functional as F
 import numpy as np
 import math
 
+
 class Node:
     """
     A node in the Monte Carlo Tree Search tree.
-    
+
     Each node represents a game state and stores statistics about
     visits and scores for this state, along with references to
     parent and child nodes.
     """
+
     def __init__(self, parent, state, to_play, game, config):
         """
         Initialize a new node in the MCTS tree.
-        
+
         Args:
             parent (Node): Parent node in the tree (None for root)
             state (numpy.ndarray): Game state this node represents
@@ -35,12 +37,12 @@ class Node:
     def check_winning_move(self, state, action, player):
         """
         Check if a move leads to an immediate win.
-        
+
         Args:
             state (numpy.ndarray): Current game state
             action (int): Move to check
             player (int): Player making the move
-            
+
         Returns:
             bool: True if the move wins the game
         """
@@ -53,7 +55,7 @@ class Node:
         1. Winning moves
         2. Moves that don't allow opponent to win next turn
         3. Forced moves (when all moves allow opponent to win)
-        
+
         Returns:
             list: Prioritized list of valid actions
         """
@@ -69,17 +71,17 @@ class Node:
         # Categorize remaining moves as safe or forced
         safe_moves = []
         forced_moves = []
-        
+
         for action in valid_moves:
             next_state = self.game.get_next_state(self.state, action, self.to_play)
             opponent_can_win = False
-            
+
             # Check if opponent can win after this move
             for opp_action in self.game.get_valid_moves(next_state):
                 if self.check_winning_move(next_state, opp_action, -self.to_play):
                     opponent_can_win = True
                     break
-            
+
             if opponent_can_win:
                 forced_moves.append(action)
             else:
@@ -93,21 +95,22 @@ class Node:
         Prioritizes safe moves using get_safe_actions().
         """
         valid_moves = self.get_safe_actions()
-        
+
         if not valid_moves:
             self.total_score = self.game.evaluate(self.state)
             return
 
         for action in valid_moves:
             child_state = -self.game.get_next_state(self.state, action)
-            self.children[action] = Node(self, child_state, -self.to_play, 
-                                       self.game, self.config)
+            self.children[action] = Node(
+                self, child_state, -self.to_play, self.game, self.config
+            )
 
     def select_child(self):
         """
         Select the most promising child node using PUCT algorithm
         with additional safety bonuses.
-        
+
         Returns:
             Node: Selected child node
         """
@@ -117,17 +120,17 @@ class Node:
 
         for action, child in self.children.items():
             puct = self.calculate_puct(child)
-            
+
             # Add safety bonus for moves that don't give opponent a win
             next_state = self.game.get_next_state(self.state, action, self.to_play)
             opponent_can_win = any(
                 self.check_winning_move(next_state, opp_action, -self.to_play)
                 for opp_action in self.game.get_valid_moves(next_state)
             )
-            
+
             if not opponent_can_win:
                 puct += 0.1  # Safety bonus
-                
+
             if puct > best_puct:
                 best_puct = puct
                 best_child = child
@@ -139,10 +142,10 @@ class Node:
         """
         Calculate the PUCT score for a child node.
         PUCT balances exploitation (node value) with exploration (visit count).
-        
+
         Args:
             child (Node): Child node to evaluate
-            
+
         Returns:
             float: PUCT score
         """
@@ -153,7 +156,7 @@ class Node:
     def backpropagate(self, value):
         """
         Update node statistics with the result of a simulation.
-        
+
         Args:
             value (float): Value to backpropagate (-1 to 1)
         """
@@ -180,10 +183,11 @@ class MCTS:
     Monte Carlo Tree Search implementation with neural network guidance
     and safety-aware move selection.
     """
+
     def __init__(self, network, game, config):
         """
         Initialize MCTS with neural network for move evaluation.
-        
+
         Args:
             network (torch.nn.Module): Neural network for state evaluation
             game (ConnectFour): Game instance for rules and mechanics
@@ -196,26 +200,26 @@ class MCTS:
     def search(self, state, total_iterations, temperature=None):
         """
         Perform MCTS search from a given state.
-        
+
         Args:
             state (numpy.ndarray): Starting game state
             total_iterations (int): Number of MCTS iterations to perform
             temperature (float, optional): Temperature for move selection
-            
+
         Returns:
             tuple: (selected_action, root_node)
         """
         # Initialize root node
         root = Node(None, state, 1, self.game, self.config)
         valid_moves = self.game.get_valid_moves(state)
-        
+
         # Get initial policy and value from neural network
         state_tensor = torch.as_tensor(
             self.game.encode_state(state),
             dtype=torch.float32,
-            device=self.config.device
+            device=self.config.device,
         ).unsqueeze(0)
-        
+
         with torch.no_grad():
             value, logits = self.network(state_tensor)
 
@@ -223,14 +227,13 @@ class MCTS:
         action_probs = F.softmax(logits.view(self.game.cols), dim=0).cpu().numpy()
         noise = np.random.dirichlet([self.config.dirichlet_alpha] * self.game.cols)
         action_probs = (
-            (1 - self.config.dirichlet_eps) * action_probs +
-            self.config.dirichlet_eps * noise
-        )
-        
+            1 - self.config.dirichlet_eps
+        ) * action_probs + self.config.dirichlet_eps * noise
+
         # Convert valid_moves to numpy array if needed
         if isinstance(valid_moves, list):
             valid_moves = np.array(valid_moves)
-        
+
         # Normalize probabilities for valid moves
         action_probs = action_probs[valid_moves]
         action_probs /= np.sum(action_probs)
@@ -257,11 +260,15 @@ class MCTS:
                 current_node.expand()
                 if current_node.children:
                     # Evaluate new nodes with neural network
-                    state_tensor = torch.tensor(
-                        self.game.encode_state(current_node.state),
-                        dtype=torch.float
-                    ).unsqueeze(0).to(self.config.device)
-                    
+                    state_tensor = (
+                        torch.tensor(
+                            self.game.encode_state(current_node.state),
+                            dtype=torch.float,
+                        )
+                        .unsqueeze(0)
+                        .to(self.config.device)
+                    )
+
                     with torch.no_grad():
                         value, logits = self.network(state_tensor)
                         value = value.item()
@@ -270,12 +277,15 @@ class MCTS:
                     valid_moves = self.game.get_valid_moves(current_node.state)
                     if isinstance(valid_moves, list):
                         valid_moves = np.array(valid_moves)
-                    action_probs = F.softmax(
-                        logits.view(self.game.cols)[valid_moves], 
-                        dim=0
-                    ).cpu().numpy()
-                    
-                    for child, prob in zip(current_node.children.values(), action_probs):
+                    action_probs = (
+                        F.softmax(logits.view(self.game.cols)[valid_moves], dim=0)
+                        .cpu()
+                        .numpy()
+                    )
+
+                    for child, prob in zip(
+                        current_node.children.values(), action_probs
+                    ):
                         child.prob = prob
                 else:
                     value = self.game.evaluate(current_node.state)
@@ -284,50 +294,54 @@ class MCTS:
 
             # Backpropagation phase
             current_node.backpropagate(value)
-        
-        temperature = temperature if temperature is not None else self.config.temperature
+
+        temperature = (
+            temperature if temperature is not None else self.config.temperature
+        )
         return self.select_action(root, temperature), root
 
     def select_action(self, root, temperature=None):
         """
         Select an action based on visit counts and safety considerations.
-        
+
         Args:
             root (Node): Root node of the MCTS tree
             temperature (float, optional): Temperature parameter for move selection
-            
+
         Returns:
             int: Selected action
         """
-        temperature = temperature if temperature is not None else self.config.temperature
+        temperature = (
+            temperature if temperature is not None else self.config.temperature
+        )
         action_counts = {key: val.n_visits for key, val in root.children.items()}
-        
+
         if not action_counts:
             return None
-            
+
         # First priority: winning moves
         for action in action_counts:
             if root.check_winning_move(root.state, action, root.to_play):
                 return action
-                
+
         # Second priority: safe moves
         safe_moves = {}
         for action in action_counts:
             next_state = root.game.get_next_state(root.state, action, root.to_play)
             opponent_moves = root.game.get_valid_moves(next_state)
-            
+
             opponent_can_win = any(
                 root.check_winning_move(next_state, opp_action, -root.to_play)
                 for opp_action in opponent_moves
             )
-                    
+
             if not opponent_can_win:
                 safe_moves[action] = action_counts[action]
-        
+
         # Use safe moves if available
         if safe_moves:
             action_counts = safe_moves
-        
+
         # Select action based on temperature
         if temperature == 0 or len(action_counts) == 1:
             return max(action_counts, key=action_counts.get)
@@ -342,5 +356,5 @@ class MCTS:
                 # Apply temperature to visit counts
                 distribution = values ** (1 / temperature)
                 distribution = distribution / distribution.sum()
-                
+
             return np.random.choice(list(action_counts.keys()), p=distribution)
