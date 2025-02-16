@@ -18,7 +18,7 @@ class ConnectFourGUI:
     user input, move animation, and AI move generation.
     """
     
-    def __init__(self, model_path='models/model_weights.pth'):
+    def __init__(self, model_path='model_weights.pth'):
         """
         Initialize the Connect Four GUI.
         
