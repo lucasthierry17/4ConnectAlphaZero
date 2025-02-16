@@ -163,3 +163,4 @@ Project Link: [https://github.com/lucasthiery17/4ConnectAlphaZero](https://githu
 - [PyTorch](https://pytorch.org/)
 - [Pygame](https://www.pygame.org/)
 - [Implementation from Surag Nair](https://github.com/suragnair/alpha-zero-general)
+You can find more sources and information in the documentation (xy)
