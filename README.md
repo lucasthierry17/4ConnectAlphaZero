@@ -32,7 +32,7 @@ virtual environment (recommended)
 
 1. Clone the repository
 ```bash
-git clone https://github.com/lucasthierry/4ConnectAlphaZero.git
+git clone https://github.com/lucasthierry17/4ConnectAlphaZero.git
 cd 4ConnectAlphaZero
 ```
 
