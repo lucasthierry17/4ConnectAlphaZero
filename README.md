@@ -7,7 +7,7 @@
 A Connect Four implementation trained using the AlphaZero algorithm, featuring self-play, neural network training, and a graphical user interface.
 
 <p align="center">
-  <img src="docs/assets/game_preview.png" alt="Connect Four Game" width="400"/>
+  <img src="https://github.com/user-attachments/assets/e178aea7-eb38-4101-b6f2-3db102fa624f" alt="Connect Four Game" width="300"/>
 </p>
 
 ## ✨ Features
