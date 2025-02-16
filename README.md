@@ -162,3 +162,4 @@ Project Link: [https://github.com/lucasthiery17/4ConnectAlphaZero](https://githu
 - [AlphaZero Paper](https://arxiv.org/abs/1712.01815)
 - [PyTorch](https://pytorch.org/)
 - [Pygame](https://www.pygame.org/)
+- [Implementation from Surag Nair](https://github.com/suragnair/alpha-zero-general)
